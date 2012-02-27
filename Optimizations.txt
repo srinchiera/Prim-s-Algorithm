@@ -1,0 +1,4 @@
+Cut array into two.
+When generating keep an extra column to store smallest edge in the row.
+Can we get the distribution of the smallest numbers in a uniform range?
+What's the probability of our algorithm using an edge greater than k? If the p is less than .0001 can we throw it away?
