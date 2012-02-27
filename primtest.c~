@@ -10,7 +10,8 @@ int
 main(int argc, char *argv[]){
     
     int numpoints, numtrials, mode, dimension;
-    int (*generateGraph)(int);
+    int *generategraph;
+    *generategraph = numtrials;
     if (argc != 5) {
         printf("usage: randmst mode numpoints numtrials dimension\n");
         return 1;
