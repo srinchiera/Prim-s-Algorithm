@@ -64,8 +64,10 @@ main(int argc, char *argv[]){
 int
 prims(float *graph){
     
-	int dist[n]; // distance from source
-	int prev[n]; // previous vertex
+	double dist[n]; // distance from source
+	//int prev[n];
+    /* previous vertex I don't think we need to keep track of previous for 
+     This assignment */
     int setS[n], zeroOutS; // vertices in set S
     for (zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
         setS[zeroOutS] = 0;
@@ -74,42 +76,55 @@ prims(float *graph){
     int vertex2; // vertex that forms edge
     float testEdge; // length of edge
     
-    binHeap heap = initialize(n);
-    insert(0, 0, &heap);
     
+    heapElt *heapPtr[n];
+    
+    for (int i = 0; i < n; i++)
+        heapPtr[i] = NULL;
+    
+    binHeap heap = initialize(n);
+    insert(0, 0, &heap, heapPtr);
+    
+    // set all distances to source to infinity
     for (int i = 0; i < n; i++){
         dist[i] = -1;
-        prev[i] = 0;
+        //prev[j] = 0;
     }
 
     dist[0] = 0;
     
     while(!isEmpty(heap)){
-        /* in this implementation, heaps may contain some vertices more than once. 
-            if this is ever the case, and we use deleteMin more than once on some vertex
-            it will discard this vertex. However, in this implementation we will be using delete
-            min many more times than V. Also, our maxheap must be much higher.
-            How can we do better? */
-        
-   //     do {
-            vertex = deleteMin(&heap);
- //       } while (setS[vertex]);
+       // how do we make sure each vertex is going to the heap only once?
+    /* create an array of size v. each index will store the address in the heap
+     where some vertex v is. during an insert, it will first check the array to see if that vertex
+     is in the array, if so, it will just update the value array[vertex]->edgeSize = blah.
+     Also whenever there is an insert binHeap will rearrange this array as necessary.
+     Deletemin will Null out this pointer*/
+        vertex = deleteMin(&heap, heapPtr);
         
         setS[vertex] = vertex;
+        heapPtr[vertex] = NULL; // node is no longer in heap
         for (vertex2 = 0; vertex2 < n; vertex2++)
             if (!(setS[vertex2])) {
                 if (dist[vertex2] > (testEdge = length(vertex, vertex2, graph)) || 
                     dist[vertex2] == -1){
                     dist[vertex2] = testEdge;
-                    printf("%d\n", dist[vertex2]);
-                    prev[vertex2] = vertex;
-                    insert(vertex2, dist[vertex2], &heap);
+                    if (heapPtr[vertex2]) // check to see if node is in heap first
+                        heapPtr[vertex2]->edgeSize = dist[vertex2];
+                        /*HEAPIFY AND THEN WE'RE DONE;*/
+                    else
+                        insert(vertex2, dist[vertex2], &heap, heapPtr);
                 }
             }
     }
-    for (int i = 0; i < n; i++)
-        printf("%d\n", dist[i]);
-               
+    
+    // prints weight of MST
+    int totalWeight = 0;
+    for (int i = 0; i < n; i++){
+        totalWeight += dist[i];
+    }
+    
+    printf("Total Weight: %d\n", totalWeight);
     return 0;
 }
 
@@ -138,3 +153,4 @@ float
 *generate4d(int n){
     return 0;
 }
+

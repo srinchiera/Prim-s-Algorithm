@@ -12,19 +12,22 @@ initialize(int maxElements){
     return heap;
 }
 
-void insert(int vertex, float size, binHeap *heap){
+void insert(int vertex, float size, binHeap *heap, heapElt **heapPtr){
     int i;
     
-    for(i = ++heap->size; heap->nodes[i/2].edgeSize > size; i /= 2 )
+    for(i = ++heap->size; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
         heap->nodes[i] = heap->nodes[i/2];
+        heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+    }
     
     heap->nodes[i].vertex = vertex;
+    heapPtr[vertex] = &(heap->nodes[i]);
     heap->nodes[i].edgeSize = size;
 
 };
 
 int
-deleteMin(binHeap *heap){
+deleteMin(binHeap *heap, heapElt **heapPtr){
     int i, child;
     heapElt minElt, lastElt;
     
@@ -37,13 +40,18 @@ deleteMin(binHeap *heap){
         if(child != heap->size && heap->nodes[child+1].edgeSize < heap->nodes[child].edgeSize)
             child++;
         
-        if(lastElt.edgeSize > heap->nodes[child].edgeSize)
+        if(lastElt.edgeSize > heap->nodes[child].edgeSize) {
             heap->nodes[i].vertex = heap->nodes[child].vertex;
+            heap->nodes[i].edgeSize = heap -> nodes[child].edgeSize;
+            heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+        }
         else
             break;
     }
     
     heap->nodes[i] = lastElt;
+    heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+
     return minElt.vertex;
 };
 

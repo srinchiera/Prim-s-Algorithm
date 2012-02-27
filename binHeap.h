@@ -16,8 +16,9 @@ typedef struct binHeap
 } binHeap;
 
 binHeap initialize(int maxElements);
-void insert(int elt, float dist, binHeap *heap);
-int deleteMin(binHeap *h);
+void insert(int elt, float dist, binHeap *heap, heapElt **heapPtr);
+int deleteMin(binHeap *h, heapElt **heapPtr);
 int isEmpty(binHeap h);
 
 #endif
+
