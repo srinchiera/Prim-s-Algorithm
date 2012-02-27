@@ -4,10 +4,6 @@
 
 
 float length(int vertex1, int vertex2, float *graph);
-float *generate1d(int n);
-float *generate2d(int n);
-float *generate3d(int n);
-float *generate4d(int n);
 int prims(float *graph);
 
 int n;
@@ -40,7 +36,16 @@ main(int argc, char *argv[]){
         return 1;
     }
     
-    switch (atoi(argv[4])) {
+    
+    dimension = atoi(argv[4]);
+    float** init;
+    int i, j, k;
+    i = 1;
+
+    float adjmatrix[numpoints][numpoints];
+    float* init2;
+
+    switch (dimension) {
         case 1:
             generateGraph = generate1d;
             break;
@@ -56,8 +61,27 @@ main(int argc, char *argv[]){
             break;
     }
     
-    float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
-    prims(test);
+	do {
+		init = generateGraph(mode, numpoints, i);
+		// no need to copy matrix over, we can just feed the pointer to our algorithm
+	    for (k = 0; k < numpoints; k++){
+            init2 = init[k];
+            for (j = 0; j < numpoints; j++){
+                adjmatrix[k][j] = init2[j];
+            }
+        }
+        for (k = 0; k < numpoints; k++){
+            for (j = 0; j < numpoints; j++){
+                printf("%f ",adjmatrix[k][j]);
+            }
+            printf("\n");
+        }
+        i++;
+        printf("\n");
+    } while (i <= numtrials);
+
+    //float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
+    //prims(test);
     
 }
 
@@ -132,25 +156,3 @@ float
 length(int vertex1, int vertex2, float *graph) {
     return vertex1 < vertex2 ? graph[vertex1*n+vertex2] : graph[vertex2*n+vertex1];
 }
-
-
-float
-*generate1d(int n){
-    return 0;
-}
-
-float
-*generate2d(int n){
-    return 0;
-}
-
-float
-*generate3d(int n){
-    return 0;
-}
-
-float
-*generate4d(int n){
-    return 0;
-}
-

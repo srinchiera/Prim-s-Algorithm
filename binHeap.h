@@ -1,15 +1,12 @@
 #ifndef prims_binHeap_h
 #define prims_binHeap_h
 
-typedef struct heapElt
-{
+typedef struct heapElt {
     int vertex;
     float edgeSize;
-    
 } heapElt;
 
-typedef struct binHeap
-{
+typedef struct binHeap {
     int maxSize;
     int size;
     heapElt *nodes;
