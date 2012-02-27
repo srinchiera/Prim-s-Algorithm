@@ -15,9 +15,14 @@ int n;
 int
 main(int argc, char *argv[]){
     
-    int numpoints, numtrials, mode, dimension;
+<<<<<<< HEAD
+    int numpoints, numtrials, mode;
     float *(*generateGraph)(int);
     
+=======
+    int numpoints, numtrials, mode, dimension;
+    int (*generateGraph)(int);
+>>>>>>> f8d61ab8148d78d32fe5d400a89c2f2c5d3c7d7f
     if (argc != 5) {
         printf("usage: randmst mode numpoints numtrials dimension\n");
         return 1;
@@ -35,12 +40,16 @@ main(int argc, char *argv[]){
         return 1;
     }
     
+<<<<<<< HEAD
+    if (((mode = atoi(argv[3])) < 0)) {
+=======
     if ((mode = atoi(argv[3]) < 0 || mode > 3)) {
+>>>>>>> f8d61ab8148d78d32fe5d400a89c2f2c5d3c7d7f
         printf("mode must be between 0 and 3, inclusive\n");
         return 1;
     }
     
-    switch (atoi(argv[4])) {
+    switch (dimension = atoi(argv[4])) {
         case 1:
             generateGraph = generate1d;
             break;

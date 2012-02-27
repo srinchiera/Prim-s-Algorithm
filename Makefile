@@ -1,2 +1,2 @@
 randmst: prim.c binHeap.c binHeap.h
-	gcc -o randmst prim.c binHeap.c -std=C99 -g
+	gcc -o randmst prim.c binHeap.c -std=c99 -g
