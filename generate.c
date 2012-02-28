@@ -6,7 +6,7 @@
 #include <time.h>
 
 struct timeval;
-//
+
 float*
 generate1d(int mode, int numpoints, float *array){
     struct timeval tim;

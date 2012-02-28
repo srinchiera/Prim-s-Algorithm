@@ -63,15 +63,17 @@ main(int argc, char *argv[]){
     int i = 0;
 	do {
 		generateGraph(mode, numpoints, adjmatrix);
-
+/*
         for (int k = 0; k < numpoints; k++){
             for (int j = 0; j < numpoints; j++){
                 printf("%f ",adjmatrix[k*numpoints + j]);
             }
             printf("\n");
         }
+ */
         i++;
-        printf("\n");
+  //      printf("\n");
+ 
         weightSum += prims(adjmatrix);
     } while (i < numtrials);
     
@@ -137,7 +139,7 @@ prims(float *graph){
         totalWeight += dist[i];
     }
     
-    printf("Total Weight: %f\n", totalWeight);
+  //  printf("Total Weight: %f\n", totalWeight);
     return totalWeight;
 }
 
