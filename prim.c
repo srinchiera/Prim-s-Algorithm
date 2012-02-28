@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "binHeap.h"
-
+#include "generate.h"
 
 float length(int vertex1, int vertex2, float *graph);
 int prims(float *graph);
@@ -12,7 +12,7 @@ int
 main(int argc, char *argv[]){
     
     int numpoints, numtrials, mode, dimension;
-    float *(*generateGraph)(int);
+    float *(*generateGraph)(int, int, float *);
     
     if (argc != 5) {
         printf("usage: randmst mode numpoints numtrials dimension\n");
@@ -36,62 +36,55 @@ main(int argc, char *argv[]){
         return 1;
     }
     
-    
     dimension = atoi(argv[4]);
-    float** init;
-    int i, j, k;
-    i = 1;
-
-    float adjmatrix[numpoints][numpoints];
-    float* init2;
-
+    
     switch (dimension) {
         case 1:
             generateGraph = generate1d;
             break;
         case 2:
             generateGraph = generate2d;
+            break;
         case 3:
             generateGraph = generate3d;
+            break;
         case 4:
             generateGraph = generate4d;
+            break;
         default:
             printf("dimensions must be between 1 and 4\n");
             return 1;
             break;
+    
     }
     
+    float *adjmatrix = malloc(numpoints*numpoints * sizeof(float));
+    
+    int i = 0;
 	do {
-		init = generateGraph(mode, numpoints, i);
-		// no need to copy matrix over, we can just feed the pointer to our algorithm
-	    for (k = 0; k < numpoints; k++){
-            init2 = init[k];
-            for (j = 0; j < numpoints; j++){
-                adjmatrix[k][j] = init2[j];
-            }
-        }
-        for (k = 0; k < numpoints; k++){
-            for (j = 0; j < numpoints; j++){
-                printf("%f ",adjmatrix[k][j]);
+		generateGraph(mode, numpoints, adjmatrix);
+
+        for (int k = 0; k < numpoints; k++){
+            for (int j = 0; j < numpoints; j++){
+                printf("%f ",adjmatrix[k*numpoints + j]);
             }
             printf("\n");
         }
         i++;
         printf("\n");
-    } while (i <= numtrials);
-
-    //float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
-    //prims(test);
+    } while (i < numtrials);
     
+    //prims (adjmatrix)
+   /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
+    prims(test);*/
+    
+    prims(adjmatrix);
 }
 
 int
 prims(float *graph){
     
 	double dist[n]; // distance from source
-	//int prev[n];
-    /* previous vertex I don't think we need to keep track of previous for 
-     This assignment */
     int setS[n], zeroOutS; // vertices in set S
     for (zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
         setS[zeroOutS] = 0;
@@ -99,7 +92,6 @@ prims(float *graph){
     int vertex;  // vertex
     int vertex2; // vertex that forms edge
     float testEdge; // length of edge
-    
     
     heapElt *heapPtr[n];
     
@@ -110,20 +102,12 @@ prims(float *graph){
     insert(0, 0, &heap, heapPtr);
     
     // set all distances to source to infinity
-    for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++)
         dist[i] = -1;
-        //prev[j] = 0;
-    }
-
+    
     dist[0] = 0;
     
-    while(!isEmpty(heap)){
-       // how do we make sure each vertex is going to the heap only once?
-    /* create an array of size v. each index will store the address in the heap
-     where some vertex v is. during an insert, it will first check the array to see if that vertex
-     is in the array, if so, it will just update the value array[vertex]->edgeSize = blah.
-     Also whenever there is an insert binHeap will rearrange this array as necessary.
-     Deletemin will Null out this pointer*/
+    while(!isEmpty(&heap)){
         vertex = deleteMin(&heap, heapPtr);
         
         setS[vertex] = vertex;
@@ -133,9 +117,12 @@ prims(float *graph){
                 if (dist[vertex2] > (testEdge = length(vertex, vertex2, graph)) || 
                     dist[vertex2] == -1){
                     dist[vertex2] = testEdge;
-                    if (heapPtr[vertex2]) // check to see if node is in heap first
+                    if (heapPtr[vertex2]){ // check to see if node is in heap first
                         heapPtr[vertex2]->edgeSize = dist[vertex2];
+                        heapify(&heap, heapPtr[vertex2]);
                         /*HEAPIFY AND THEN WE'RE DONE;*/
+
+                    }
                     else
                         insert(vertex2, dist[vertex2], &heap, heapPtr);
                 }
@@ -143,12 +130,12 @@ prims(float *graph){
     }
     
     // prints weight of MST
-    int totalWeight = 0;
+    float totalWeight = 0;
     for (int i = 0; i < n; i++){
         totalWeight += dist[i];
     }
     
-    printf("Total Weight: %d\n", totalWeight);
+    printf("Total Weight: %f\n", totalWeight);
     return 0;
 }
 
