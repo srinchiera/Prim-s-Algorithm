@@ -4,7 +4,7 @@
 #include "generate.h"
 
 float length(int vertex1, int vertex2, float *graph);
-int prims(float *graph);
+float prims(float *graph);
 
 int n;
 
@@ -59,7 +59,7 @@ main(int argc, char *argv[]){
     }
     
     float *adjmatrix = malloc(numpoints*numpoints * sizeof(float));
-    
+    float weightSum = 0;
     int i = 0;
 	do {
 		generateGraph(mode, numpoints, adjmatrix);
@@ -72,16 +72,18 @@ main(int argc, char *argv[]){
         }
         i++;
         printf("\n");
+        weightSum += prims(adjmatrix);
     } while (i < numtrials);
     
+    printf("Average weight for %d trials: %f\n", numtrials, weightSum/numtrials);
     //prims (adjmatrix)
    /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
     prims(test);*/
     
-    prims(adjmatrix);
+
 }
 
-int
+float
 prims(float *graph){
     
 	double dist[n]; // distance from source
@@ -136,7 +138,7 @@ prims(float *graph){
     }
     
     printf("Total Weight: %f\n", totalWeight);
-    return 0;
+    return totalWeight;
 }
 
 float
