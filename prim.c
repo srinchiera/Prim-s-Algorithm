@@ -58,7 +58,7 @@ main(int argc, char *argv[]){
     
     }
     
-    float *adjmatrix = malloc(numpoints*numpoints * sizeof(float));
+    float *adjmatrix = malloc((numpoints*(numpoints +1))/2 * sizeof(float));
     float weightSum = 0;
     int i = 0;
     mode = atoi(argv[1]);
@@ -76,8 +76,8 @@ main(int argc, char *argv[]){
             generateGraph(mode, numpoints, adjmatrix);
             
              for (int k = 0; k < numpoints; k++){
-                 for (int j = 0; j < numpoints; j++){
-                     printf("%f ",adjmatrix[k*numpoints + j]);
+                 for (int j = 0; j < numpoints-k; j++){
+                     printf("%f ",adjmatrix[(k*numpoints)-((k*(k+1))/2)+j + k]);
                  }
              printf("\n");
              }
@@ -93,6 +93,7 @@ main(int argc, char *argv[]){
     printf("%f %d %d %d\n", 
           weightSum/numtrials, numpoints, numtrials, dimension);
     
+    free(adjmatrix);
     //prims (adjmatrix)
    /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
     prims(test);*/
@@ -144,8 +145,6 @@ prims(float *graph){
                     if (heapPtr[vertex2]){ // check to see if node is in heap first
                         heapPtr[vertex2]->edgeSize = dist[vertex2];
                         heapify(&heap, heapPtr[vertex2]);
-                        /*HEAPIFY AND THEN WE'RE DONE;*/
-
                     }
                     else
                         insert(vertex2, dist[vertex2], &heap, heapPtr);
@@ -153,7 +152,6 @@ prims(float *graph){
             }
     }
     
-    // prints weight of MST
     float totalWeight = 0;
     for (int i = 0; i < n; i++){
         totalWeight += dist[i];
@@ -162,7 +160,11 @@ prims(float *graph){
     return totalWeight;
 }
 
-float
+inline float
 length(int vertex1, int vertex2, float *graph) {
-    return vertex1 < vertex2 ? graph[vertex1*n+vertex2] : graph[vertex2*n+vertex1];
+    
+    
+    
+    return vertex1 < vertex2 ? graph[(vertex1*n)-(vertex1*(vertex1+1))/2+vertex2] 
+            : graph[(vertex2*n)-(vertex2*(vertex2+1))/2+vertex1];
 }

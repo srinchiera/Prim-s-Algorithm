@@ -93,7 +93,5 @@ heapify(binHeap *heap, heapElt *heapPtr){
 }
 
 int isEmpty(binHeap *heap){
-    
     return heap->size == 0;
-
 };

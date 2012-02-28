@@ -1,11 +1,8 @@
-Cut array into two.
 When generating keep an extra column to store smallest edge in the row.
 Can we get the distribution of the smallest numbers in a uniform range?
 What's the probability of our algorithm using an edge greater than k? If the p is less than .0001 can we throw it away?
 
 malloc graph space in main, pass pointer, and then call generate passing pointer to matrix
-
-Note also that it's very bad for cache locality the way we are currently inserting values so maybe we can only store half of the adjacency list.
 
 Take out memory accesses.
 
@@ -21,4 +18,4 @@ pdf of smallest number out of 1 uniformly chosen number
 
 Sum these all up
 
-Will this work?
+We might have to make an adjacency list :(

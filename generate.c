@@ -18,18 +18,23 @@ generate1d(int mode, int numpoints, float *array){
     int i, j;
     
     float a = RAND_MAX;
+    float *fillIn = array;
     for (i = 0; i < numpoints; i++){
-        for (j = i; j < numpoints; j++){
-            if (i == j){
-                array[i*numpoints + j] = 0;
+        *fillIn = 0;
+        fillIn++;
+        for (j = 0; j < numpoints-i-1; j++){
+            *fillIn = rand() / a;
+            fillIn++;
+            /*
+            if (i == ){
+                array[(i*numpoints)-(i*(i+1))/2+j] = 0;
             }
             else {
-                array[i*numpoints + j] = rand() / a;
-                array[j*numpoints + i] = array[i*numpoints + j];
+                array[(i*numpoints)-(i*(i+1))/2+j] = rand() / a;
             }
+             */
         }
     }
-    
     return array;
 }
 
