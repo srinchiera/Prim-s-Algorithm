@@ -39,7 +39,7 @@ main(int argc, char *argv[]){
     dimension = atoi(argv[4]);
     
     switch (dimension) {
-        case 1:
+        case 0:
             generateGraph = generate1d;
             break;
         case 2:
@@ -52,7 +52,7 @@ main(int argc, char *argv[]){
             generateGraph = generate4d;
             break;
         default:
-            printf("dimensions must be between 1 and 4\n");
+            printf("dimensions must be between 0,2,3 or 4\n");
             return 1;
             break;
     
@@ -61,28 +61,42 @@ main(int argc, char *argv[]){
     float *adjmatrix = malloc(numpoints*numpoints * sizeof(float));
     float weightSum = 0;
     int i = 0;
+    mode = atoi(argv[1]);
+    
+    if (mode == 0)
 	do {
 		generateGraph(mode, numpoints, adjmatrix);
-/*
-        for (int k = 0; k < numpoints; k++){
-            for (int j = 0; j < numpoints; j++){
-                printf("%f ",adjmatrix[k*numpoints + j]);
-            }
-            printf("\n");
-        }
- */
-        i++;
-  //      printf("\n");
- 
+        i++; 
         weightSum += prims(adjmatrix);
     } while (i < numtrials);
+    else if (mode == 1){
+        float tmpTotal;
+        
+        do {
+            generateGraph(mode, numpoints, adjmatrix);
+            
+             for (int k = 0; k < numpoints; k++){
+                 for (int j = 0; j < numpoints; j++){
+                     printf("%f ",adjmatrix[k*numpoints + j]);
+                 }
+             printf("\n");
+             }
+            
+            i++;
+            tmpTotal = prims(adjmatrix);
+            printf("MPT weight: %f\n", tmpTotal);
+            weightSum += tmpTotal;
+            
+        } while (i < numtrials);
+    }
     
-    printf("Average weight for %d trials: %f\n", numtrials, weightSum/numtrials);
+    printf("%f %d %d %d\n", 
+          weightSum/numtrials, numpoints, numtrials, dimension);
+    
     //prims (adjmatrix)
    /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
     prims(test);*/
     
-
 }
 
 float
@@ -112,10 +126,16 @@ prims(float *graph){
     dist[0] = 0;
     
     while(!isEmpty(&heap)){
+        // our next edge is the smallest edge we can get to
         vertex = deleteMin(&heap, heapPtr);
         
+        // insert it into S
         setS[vertex] = vertex;
-        heapPtr[vertex] = NULL; // node is no longer in heap
+        
+        // this node is no longer in the heap
+        heapPtr[vertex] = NULL;
+        
+        // skipping over all the edges we've already seen
         for (vertex2 = 0; vertex2 < n; vertex2++)
             if (!(setS[vertex2])) {
                 if (dist[vertex2] > (testEdge = length(vertex, vertex2, graph)) || 
@@ -139,7 +159,6 @@ prims(float *graph){
         totalWeight += dist[i];
     }
     
-  //  printf("Total Weight: %f\n", totalWeight);
     return totalWeight;
 }
 
