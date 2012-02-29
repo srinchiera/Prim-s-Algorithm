@@ -15,16 +15,33 @@ initialize(int maxElements){
 void insert(int vertex, float size, binHeap *heap, heapElt **heapPtr){
     int i;
     
-    for(i = ++heap->size; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
-        heap->nodes[i] = heap->nodes[i/2];
-        heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+    // if vertex is not in heap
+    if(!heapPtr[vertex]) {
+        for(i = ++heap->size; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
+            heap->nodes[i] = heap->nodes[i/2];
+            heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+        }
         
+        heap->nodes[i].vertex = vertex;
+        heap->nodes[i].edgeSize = size;
+        
+        heapPtr[vertex] = &(heap->nodes[i]);
     }
-    
-    heap->nodes[i].vertex = vertex;
-    heapPtr[vertex] = &(heap->nodes[i]);
-    heap->nodes[i].edgeSize = size;
-    
+    // else if vertex is in heap
+    else {
+        int indexOfElt = ((int)(heapPtr) - (int)(heap->nodes))/ sizeof(heapElt);
+        heapPtr[vertex]->edgeSize = size;
+        
+        for(i = indexOfElt; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
+            heap->nodes[i] = heap->nodes[i/2];
+            heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+        }
+        
+        heap->nodes[i].vertex = vertex;
+        heap->nodes[i].edgeSize = size;
+        
+        heapPtr[vertex] = &(heap->nodes[i]);
+    }
 
 };
 
@@ -52,7 +69,7 @@ deleteMin(binHeap *heap, heapElt **heapPtr){
         if(lastEltEdge > heap->nodes[child].edgeSize) {
             heap->nodes[i].vertex = heap->nodes[child].vertex;
             heap->nodes[i].edgeSize = heap -> nodes[child].edgeSize;
-            heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+        //    heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
         }
         else
             break;
@@ -68,29 +85,8 @@ deleteMin(binHeap *heap, heapElt **heapPtr){
 
 void
 heapify(binHeap *heap, heapElt *heapPtr){
-    int i;
-    int indexOfElt = (int)(heapPtr) - (int)(heap->nodes)/ sizeof(heapElt); // memory address difference
-    int parent;
-    
-    heapElt lastElt = *heapPtr;
-    
-    for(i = indexOfElt; i/2 > 0; i = parent) {
-        parent = i/2;
 
-        if(lastElt.edgeSize < heap->nodes[parent].edgeSize) {
-            
-            heap->nodes[i].vertex = heap->nodes[parent].vertex;
-            heap->nodes[i].edgeSize = heap -> nodes[parent].edgeSize;
-            heapPtr[heap->nodes[i].vertex] = heap->nodes[i];
-        }
-        else
-            break;
-    }
-    
-    heap->nodes[i].vertex = lastElt.vertex;
-    heap->nodes[i].edgeSize = lastElt.edgeSize;
-    heapPtr[heap->nodes[i].vertex] = heap->nodes[i];
-    
+
 }
 
 int isEmpty(binHeap *heap){

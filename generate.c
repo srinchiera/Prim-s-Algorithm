@@ -32,7 +32,6 @@ generate1d(int mode, int numpoints, vertexEdge **linkedList){
         }
         (nodePtr)->vertex = -1;
     }
-    
 
     return linkedList;
 }

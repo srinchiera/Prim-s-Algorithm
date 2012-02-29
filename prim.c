@@ -63,16 +63,21 @@ main(int argc, char *argv[]){
     int i = 0;
     mode = atoi(argv[1]);
     
-    if (mode == 0)
-	do {
-		generateGraph(mode, numpoints, adjlist);
-        i++; 
-        weightSum += prims(adjlist);
-    } while (i < numtrials);
+    
+    if (mode == 0){
+        float tmpTotal;
+        do {
+            generateGraph(mode, numpoints, adjlist);
+            tmpTotal = prims(adjlist);
+            printf("MPT weight: %f\n", tmpTotal);
+            weightSum += tmpTotal;
+            i++;
+            
+        } while (i < numtrials);
+    }
     
     else if (mode == 1){
         float tmpTotal;
-        
         do {
             generateGraph(mode, numpoints, adjlist);
             
@@ -99,18 +104,14 @@ main(int argc, char *argv[]){
     
     free(adjlist);
     
-    //prims (adjmatrix)
-   /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
-    prims(test);*/
-    
 }
 
 float
 prims(vertexEdge **graph){
     
 	double dist[n]; // distance from source
-    int setS[n], zeroOutS; // vertices in set S
-    for (zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
+    int setS[n]; // vertices in set S
+    for (int zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
         setS[zeroOutS] = 0;
     
     int vertex;  // vertex
@@ -118,7 +119,7 @@ prims(vertexEdge **graph){
     float testEdge; // length of edge
     int counter;
     
-    heapElt *heapPtr[n]; // points to vertex location inside heap, NULL if not present
+    heapElt **heapPtr = malloc(n * sizeof(heapElt)); // points to vertex location inside heap, NULL if not present
     
     for (int i = 0; i < n; i++)
         heapPtr[i] = NULL;
@@ -133,10 +134,10 @@ prims(vertexEdge **graph){
     dist[0] = 0; // distance from source to source is 0
     
     while(!isEmpty(&heap)){
+
+        
         // our next edge is the smallest edge we can get to
         vertex = deleteMin(&heap, heapPtr);
-  
-        //printf("Vertex %d: %f\n", vertex, dist[vertex]);
         
         // insert it into S
         setS[vertex] = 1;
@@ -153,18 +154,13 @@ prims(vertexEdge **graph){
                 testEdge = length(vertex, vertex2, graph, counter);
                 // make sure we didn't ommit edge from graph
                 if (testEdge != -1)
+                    counter++;
                     /* if size of edge is smaller than what is already stored,
                        or if  infinity is stored, then insert this into heap */
                     if ((dist[vertex2] > testEdge) || (dist[vertex2] == -1)){
-                        counter++;
                         // 
                         dist[vertex2] = testEdge;
-                        if (heapPtr[vertex2]){ // check to see if node is in heap first
-                            heapPtr[vertex2]->edgeSize = dist[vertex2];
-                            heapify(&heap, heapPtr[vertex2]);
-                        }
-                        else
-                            insert(vertex2, dist[vertex2], &heap, heapPtr);
+                        insert(vertex2, dist[vertex2], &heap, heapPtr);
                 }
             }
     }
