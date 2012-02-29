@@ -18,11 +18,13 @@ void insert(int vertex, float size, binHeap *heap, heapElt **heapPtr){
     for(i = ++heap->size; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
         heap->nodes[i] = heap->nodes[i/2];
         heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+        
     }
     
     heap->nodes[i].vertex = vertex;
     heapPtr[vertex] = &(heap->nodes[i]);
     heap->nodes[i].edgeSize = size;
+    
 
 };
 
@@ -67,14 +69,13 @@ deleteMin(binHeap *heap, heapElt **heapPtr){
 void
 heapify(binHeap *heap, heapElt *heapPtr){
     int i;
-    int displacement = (int) (heapPtr - heap->nodes); // memory address difference
-    int indexOfElt = (displacement / sizeof(heapElt));
+    int indexOfElt = (int)(heapPtr) - (int)(heap->nodes)/ sizeof(heapElt); // memory address difference
     int parent;
     
     heapElt lastElt = *heapPtr;
     
     for(i = indexOfElt; i/2 > 0; i = parent) {
-        parent = i / 2;
+        parent = i/2;
 
         if(lastElt.edgeSize < heap->nodes[parent].edgeSize) {
             

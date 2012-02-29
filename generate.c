@@ -7,8 +7,8 @@
 
 struct timeval;
 
-float*
-generate1d(int mode, int numpoints, float *array){
+vertexEdge **
+generate1d(int mode, int numpoints, vertexEdge **linkedList){
     struct timeval tim;
     
     gettimeofday(&tim, NULL);
@@ -16,30 +16,29 @@ generate1d(int mode, int numpoints, float *array){
     srand(seed);
     
     int i, j;
-    
     float a = RAND_MAX;
-    float *fillIn = array;
-    for (i = 0; i < numpoints; i++){
-        *fillIn = 0;
-        fillIn++;
-        for (j = 0; j < numpoints-i-1; j++){
-            *fillIn = rand() / a;
-            fillIn++;
-            /*
-            if (i == ){
-                array[(i*numpoints)-(i*(i+1))/2+j] = 0;
-            }
-            else {
-                array[(i*numpoints)-(i*(i+1))/2+j] = rand() / a;
-            }
-             */
+    vertexEdge *nodePtr;
+    
+    for (i = 0; i < numpoints; i++) {
+        linkedList[i] = malloc((numpoints-i+1) * sizeof(vertexEdge));
+        nodePtr = linkedList[i];
+        nodePtr->edgeSize = 0;
+        nodePtr->vertex = i;
+        nodePtr = nodePtr + 1;
+        for (j = i+1; j < numpoints; j++){
+            nodePtr->edgeSize = rand() / a;
+            nodePtr->vertex = j;
+            nodePtr = nodePtr + 1;
         }
+        (nodePtr)->vertex = -1;
     }
-    return array;
+    
+
+    return linkedList;
 }
 
-float*
-generate2d(int mode, int numpoints, float *array){
+vertexEdge **
+generate2d(int mode, int numpoints, vertexEdge **array){/*
     struct timeval tim;
     gettimeofday(&tim, NULL);
     unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int)tim.tv_usec;
@@ -71,10 +70,10 @@ generate2d(int mode, int numpoints, float *array){
         }
     }
     
-    return array;
+    return array;*/
 }
-float*
-generate3d(int mode, int numpoints, float *array){
+vertexEdge **
+generate3d(int mode, int numpoints, vertexEdge **array){/*
     struct timeval tim;
     gettimeofday(&tim, NULL);
     unsigned int seed = (unsigned int)tim.tv_sec * (unsigned int)tim.tv_usec;
@@ -107,11 +106,11 @@ generate3d(int mode, int numpoints, float *array){
         }
     }
     
-    return array;
+    return array;*/
 }
 
-float*
-generate4d(int mode, int numpoints, float *array){
+vertexEdge **
+generate4d(int mode, int numpoints, vertexEdge **array){/*
     struct timeval tim;
     gettimeofday(&tim, NULL);
     unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int) tim.tv_usec;
@@ -145,5 +144,5 @@ generate4d(int mode, int numpoints, float *array){
         }
     }
     
-    return array;
+    return array;*/
 }
