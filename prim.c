@@ -3,16 +3,16 @@
 #include "binHeap.h"
 #include "generate.h"
 
-float length(int vertex1, int vertex2, vertexEdge **graph, int counter);
-float prims(vertexEdge **graph);
-float findVertex (int vertex, vertexEdge *row);
+float length(int vertex1, int vertex2, float *graph);
+float prims(float *graph);
+
 int n;
 
 int
 main(int argc, char *argv[]){
     
     int numpoints, numtrials, mode, dimension;
-    vertexEdge **(*generateGraph)(int, int, vertexEdge **);
+    float *(*generateGraph)(int, int, float *);
     
     if (argc != 5) {
         printf("usage: randmst mode numpoints numtrials dimension\n");
@@ -58,41 +58,32 @@ main(int argc, char *argv[]){
     
     }
     
-    vertexEdge **adjlist = malloc(numpoints * sizeof(vertexEdge));
+    float *adjmatrix = malloc((numpoints*(numpoints +1))/2 * sizeof(float));
     float weightSum = 0;
     int i = 0;
     mode = atoi(argv[1]);
     
-    if (mode == 0){
-        float tmpTotal;
-        do {
-            generateGraph(mode, numpoints, adjlist);
-            printf("Done generating\n");
-            tmpTotal = prims(adjlist);
-            printf("MPT weight: %f\n", tmpTotal);
-            weightSum += tmpTotal;
-            i++;
-            
-        } while (i < numtrials);
-    }
-    
+    if (mode == 0)
+	do {
+		generateGraph(mode, numpoints, adjmatrix);
+        i++; 
+        weightSum += prims(adjmatrix);
+    } while (i < numtrials);
     else if (mode == 1){
         float tmpTotal;
+        
         do {
-            generateGraph(mode, numpoints, adjlist);
+            generateGraph(mode, numpoints, adjmatrix);
             
              for (int k = 0; k < numpoints; k++){
-                 vertexEdge *nodePtr = adjlist[k];
-                 for (int j = 0; j < numpoints-k+1; j++){
-                     printf("%d: ",nodePtr->vertex);
-                     printf("%f ",nodePtr->edgeSize);
-                     nodePtr++;
+                 for (int j = 0; j < numpoints-k; j++){
+                     printf("%f ",adjmatrix[(k*numpoints)-((k*(k+1))/2)+j + k]);
                  }
              printf("\n");
              }
             
             i++;
-            tmpTotal = prims(adjlist);
+            tmpTotal = prims(adjmatrix);
             printf("MPT weight: %f\n", tmpTotal);
             weightSum += tmpTotal;
             
@@ -102,64 +93,58 @@ main(int argc, char *argv[]){
     printf("%f %d %d %d\n", 
           weightSum/numtrials, numpoints, numtrials, dimension);
     
-    free(adjlist);
+    free(adjmatrix);
+    
+    //prims (adjmatrix)
+
+   /* float test[] = {0,16,5,2,8,16,0,9,14,4,5,9,0,12,3,2,14,12,0,1,8,4,3,1,0};
+    prims(test);*/
     
 }
 
 float
-prims(vertexEdge **graph){
+prims(float *graph){
     
 	double dist[n]; // distance from source
-    int setS[n]; // vertices in set S
-    for (int zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
+    int setS[n], zeroOutS; // vertices in set S
+    for (zeroOutS = 0; zeroOutS < n; zeroOutS++) // zero out set S
         setS[zeroOutS] = 0;
     
     int vertex;  // vertex
     int vertex2; // vertex that forms edge
     float testEdge; // length of edge
-    int counter;
     
-    heapElt **heapPtr = malloc(n * sizeof(heapElt)); // points to vertex location inside heap, NULL if not present
+    heapElt *heapPtr[n];
     
     for (int i = 0; i < n; i++)
         heapPtr[i] = NULL;
     
-    binHeap heap = initialize(n); // creates heap
-    insert(0, 0, &heap, heapPtr); // put source into heap
+    binHeap heap = initialize(n);
+    insert(0, 0, &heap, heapPtr);
     
     // set all distances to source to infinity
     for (int i = 0; i < n; i++)
         dist[i] = -1;
     
-    dist[0] = 0; // distance from source to source is 0
+    dist[0] = 0;
     
     while(!isEmpty(&heap)){
-
         // our next edge is the smallest edge we can get to
         vertex = deleteMin(&heap, heapPtr);
         
         // insert it into S
-        setS[vertex] = 1;
+        setS[vertex] = vertex;
         
         // this node is no longer in the heap
         heapPtr[vertex] = NULL;
-        counter = 0;
         
-        // for all edges connecting to vertex
+        // skipping over all the edges we've already seen
         for (vertex2 = 0; vertex2 < n; vertex2++)
-            // if it isn't already in our MSP
             if (!(setS[vertex2])) {
-                // get it's length
-                testEdge = length(vertex, vertex2, graph, counter);
-                // make sure we didn't ommit edge from graph
-                if (testEdge != -1){
-                    counter++;
-                    /* if size of edge is smaller than what is already stored,
-                       or if  infinity is stored, then insert this into heap */
-                    if ((dist[vertex2] > testEdge) || (dist[vertex2] == -1)){
-                        dist[vertex2] = testEdge;
-                        insert(vertex2, dist[vertex2], &heap, heapPtr);
-                    }  
+                if (dist[vertex2] > (testEdge = length(vertex, vertex2, graph)) || 
+                    dist[vertex2] == -1){
+                    dist[vertex2] = testEdge;
+                    insert(vertex2, dist[vertex2], &heap, heapPtr);
                 }
             }
     }
@@ -173,22 +158,10 @@ prims(vertexEdge **graph){
 }
 
 inline float
-length(int vertex1, int vertex2, vertexEdge **graph, int counter){
-    int smaller = vertex1 < vertex2 ? vertex1 : vertex2;
-    int larger = vertex1 >= vertex2 ? vertex1 : vertex2;
+length(int vertex1, int vertex2, float *graph) {
     
-    // nodePointer will point to where we left off in our linked list
-    vertexEdge *nodePtr = graph[smaller]+counter;
     
-    // while we are not at end of list
-    while (nodePtr->vertex != -1) {
-        if (nodePtr->vertex == larger)
-            return nodePtr->edgeSize;
-        // if it's not in list return -1
-        else if (nodePtr->vertex > larger)
-            return -1;
-        else
-            nodePtr++;
-    }
-    return -1;
+    
+    return vertex1 < vertex2 ? graph[(vertex1*n)-(vertex1*(vertex1+1))/2+vertex2] 
+            : graph[(vertex2*n)-(vertex2*(vertex2+1))/2+vertex1];
 }

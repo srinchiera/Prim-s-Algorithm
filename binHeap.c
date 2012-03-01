@@ -7,7 +7,7 @@ initialize(int maxElements){
     binHeap heap;
     heap.maxSize = maxElements;
     heap.size = 0;
-    heap.nodes = malloc((maxElements + 1)*sizeof(heapElt));
+    heap.nodes = malloc((maxElements + 1)*sizeof(float));
     heap.nodes[0].edgeSize = -1;
     return heap;
 }
@@ -34,22 +34,8 @@ void insert(int vertex, float size, binHeap *heap, heapElt **heapPtr){
         
         heapify(heap, vertex, size, index, heapPtr);
     }
-
+    
 };
-
-inline void
-heapify(binHeap *heap, int vertex, float size, int index, heapElt **heapPtr){
-    int i;
-    
-    for(i = index; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
-        heap->nodes[i] = heap->nodes[i/2];
-        heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
-    }
-    
-    heap->nodes[i].vertex = vertex;
-    heap->nodes[i].edgeSize = size;        
-    heapPtr[vertex] = &(heap->nodes[i]); 
-}
 
 int
 deleteMin(binHeap *heap, heapElt **heapPtr){
@@ -64,12 +50,12 @@ deleteMin(binHeap *heap, heapElt **heapPtr){
     
     for(i = 1; i*2 <= heapSize; i = child ) {
         child = i * 2;
+
         // if we haven't overstepped bounds of heap get the lowest child
         if(child != heapSize && heap->nodes[child+1].edgeSize < heap->nodes[child].edgeSize)
             child++;
-        
-        // store lastElt.edgesize
-        // if the last element's size is bigger than the child's size, then move
+         
+		// if the last element's size is bigger than the child's size, then move
         // the child up one
         
         if(lastEltEdge > heap->nodes[child].edgeSize) {
@@ -85,8 +71,23 @@ deleteMin(binHeap *heap, heapElt **heapPtr){
     heap->nodes[i].vertex = lastElt.vertex;
     heap->nodes[i].edgeSize = lastEltEdge;
     heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+
     return minElt.vertex;
 };
+
+inline void
+heapify(binHeap *heap, int vertex, float size, int index, heapElt **heapPtr){
+    int i;
+    
+    for(i = index; heap->nodes[i/2].edgeSize > size; i /= 2 ) {
+        heap->nodes[i] = heap->nodes[i/2];
+        heapPtr[heap->nodes[i].vertex] = &(heap->nodes[i]);
+    }
+    
+    heap->nodes[i].vertex = vertex;
+    heap->nodes[i].edgeSize = size;        
+    heapPtr[vertex] = &(heap->nodes[i]); 
+}
 
 int isEmpty(binHeap *heap){
     return heap->size == 0;
