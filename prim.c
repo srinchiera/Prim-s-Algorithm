@@ -63,11 +63,11 @@ main(int argc, char *argv[]){
     int i = 0;
     mode = atoi(argv[1]);
     
-    
     if (mode == 0){
         float tmpTotal;
         do {
             generateGraph(mode, numpoints, adjlist);
+            printf("Done generating\n");
             tmpTotal = prims(adjlist);
             printf("MPT weight: %f\n", tmpTotal);
             weightSum += tmpTotal;
@@ -135,7 +135,6 @@ prims(vertexEdge **graph){
     
     while(!isEmpty(&heap)){
 
-        
         // our next edge is the smallest edge we can get to
         vertex = deleteMin(&heap, heapPtr);
         
@@ -153,14 +152,14 @@ prims(vertexEdge **graph){
                 // get it's length
                 testEdge = length(vertex, vertex2, graph, counter);
                 // make sure we didn't ommit edge from graph
-                if (testEdge != -1)
+                if (testEdge != -1){
                     counter++;
                     /* if size of edge is smaller than what is already stored,
                        or if  infinity is stored, then insert this into heap */
                     if ((dist[vertex2] > testEdge) || (dist[vertex2] == -1)){
-                        // 
                         dist[vertex2] = testEdge;
                         insert(vertex2, dist[vertex2], &heap, heapPtr);
+                    }  
                 }
             }
     }
