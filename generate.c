@@ -7,31 +7,45 @@
 
 struct timeval;
 
-float*
-generate1d(int mode, int numpoints, float *array){
+vertexEdge **
+generate1d(int mode, int numpoints, vertexEdge **linkedList){
     struct timeval tim;
     
+    //random seed
     gettimeofday(&tim, NULL);
     unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int) tim.tv_usec;
     srand(seed);
     
     int i, j;
-    
     float a = RAND_MAX;
-    float *fillIn = array;
-    for (i = 0; i < numpoints; i++){
-        *fillIn = 0;
-        fillIn++;
-        for (j = 0; j < numpoints-i-1; j++){
-            *fillIn = rand() / a;
-            fillIn++;
+    vertexEdge *nodePtr;
+    float randNum;
+    
+    //defines edgelengths
+    for (i = 0; i < numpoints; i++) {
+        linkedList[i] = malloc((numpoints-i+1) * sizeof(vertexEdge));
+        nodePtr = linkedList[i];
+        nodePtr->edgeSize = 0;
+        nodePtr->vertex = i;
+        nodePtr++;
+        for (j = i+1; j < numpoints; j++){
+            randNum = rand()/a;
+            nodePtr->edgeSize = randNum;
+            nodePtr->vertex = j;
+            if ((numpoints > 1000 && randNum > 0.02) ||
+                (numpoints > 10000 && randNum > 0.003) ||
+                (numpoints > 20000 && randNum > 0.0015)){
+                nodePtr--;
+            }
+            nodePtr++;
         }
+        (nodePtr)->vertex = -1;
     }
-    return array;
+    return linkedList;
 }
 
-float*
-generate2d(int mode, int numpoints, float *array){
+vertexEdge **
+generate2d(int mode, int numpoints, vertexEdge **linkedList){
     struct timeval tim;
     gettimeofday(&tim, NULL);
     unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int)tim.tv_usec;
@@ -41,6 +55,7 @@ generate2d(int mode, int numpoints, float *array){
 	float points[numpoints][2];
 	float distance, xd, yd;
     int i, j;
+    vertexEdge *nodePtr;
     
     for (i = 0; i < numpoints; i++){
         for (j = 0; j < 2; j++){
@@ -48,34 +63,44 @@ generate2d(int mode, int numpoints, float *array){
         }
     }
     
-    for (i = 0; i < numpoints; i++){
-        for (j = i; j < numpoints; j++){
-            if (i == j){
-                array[i*numpoints + j] = 0;
+    for (i = 0; i < numpoints; i++) {
+
+        linkedList[i] = malloc((numpoints-i+1) * sizeof(vertexEdge));
+        nodePtr = linkedList[i];
+        nodePtr->edgeSize = 0;
+        nodePtr->vertex = i;
+        nodePtr++;
+        
+        for (j = i+1; j < numpoints; j++){
+            xd = (points[i][0] - points[j][0]);
+            yd = (points[i][1] - points[j][1]);
+            distance = sqrt(xd * xd + yd * yd);
+            nodePtr->edgeSize = distance;
+            nodePtr->vertex = j;
+            if ((numpoints > 1000 && distance > 0.1) ||
+                (numpoints > 10000 && distance > 0.05) ||
+                (numpoints > 20000 && distance > 0.025)){
+                nodePtr--;
             }
-            else {
-                xd = (points[i][0] - points[j][0]);
-                yd = (points[i][1] - points[j][1]);
-                distance = sqrt(xd * xd + yd * yd);
-                array[i*numpoints + j] = distance;
-                array[j*numpoints + i] = array[i*numpoints + j];
-            }
+            nodePtr++;
         }
+        (nodePtr)->vertex = -1;
     }
-    
-    return array;
+    return linkedList;
 }
-float*
-generate3d(int mode, int numpoints, float *array){
+
+vertexEdge **
+generate3d(int mode, int numpoints, vertexEdge **linkedList){
     struct timeval tim;
     gettimeofday(&tim, NULL);
-    unsigned int seed = (unsigned int)tim.tv_sec * (unsigned int)tim.tv_usec;
+    unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int)tim.tv_usec;
     srand(seed);
     
     float a = RAND_MAX;
 	float points[numpoints][3];
 	float distance, xd, yd, zd;
     int i, j;
+    vertexEdge *nodePtr;
     
     for (i = 0; i < numpoints; i++){
         for (j = 0; j < 3; j++){
@@ -83,36 +108,45 @@ generate3d(int mode, int numpoints, float *array){
         }
     }
     
-    for (i = 0; i < numpoints; i++){
-        for (j = i; j < numpoints; j++){
-            if (i == j){
-                array[i*numpoints + j] = 0;
+    for (i = 0; i < numpoints; i++) {
+
+        linkedList[i] = malloc((numpoints-i+1) * sizeof(vertexEdge));
+        nodePtr = linkedList[i];
+        nodePtr->edgeSize = 0;
+        nodePtr->vertex = i;
+        nodePtr++;
+        
+        for (j = i+1; j < numpoints; j++){
+            xd = (points[i][0] - points[j][0]);
+            yd = (points[i][1] - points[j][1]);
+            zd = (points[i][2] - points[j][2]);
+            distance = sqrt(xd * xd + yd * yd + zd * zd);
+            nodePtr->edgeSize = distance;
+            nodePtr->vertex = j;
+            if ((numpoints > 1000 && distance > 0.15) ||
+                (numpoints > 10000 && distance > 0.09) ||
+                (numpoints > 20000 && distance > 0.055)){
+                nodePtr--;
             }
-            else {
-                xd = (points[i][0] - points[j][0]);
-                yd = (points[i][1] - points[j][1]);
-                zd = (points[i][2] - points[j][2]);
-                distance = sqrt(xd * xd + yd * yd + zd * zd);
-                array[i*numpoints + j] = distance;
-                array[j*numpoints + i] = array[i*numpoints + j];
-            }
+            nodePtr++;
         }
+        (nodePtr)->vertex = -1;
     }
-    
-    return array;
+    return linkedList;
 }
 
-float*
-generate4d(int mode, int numpoints, float *array){
+vertexEdge **
+generate4d(int mode, int numpoints, vertexEdge **linkedList){
     struct timeval tim;
     gettimeofday(&tim, NULL);
-    unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int) tim.tv_usec;
+    unsigned int seed = (unsigned int) tim.tv_sec * (unsigned int)tim.tv_usec;
     srand(seed);
     
     float a = RAND_MAX;
 	float points[numpoints][4];
 	float distance, xd, yd, zd, wd;
     int i, j;
+    vertexEdge *nodePtr;
     
     for (i = 0; i < numpoints; i++){
         for (j = 0; j < 4; j++){
@@ -120,22 +154,30 @@ generate4d(int mode, int numpoints, float *array){
         }
     }
     
-    for (i = 0; i < numpoints; i++){
-        for (j = i; j < numpoints; j++){
-            if (i == j){
-                array[i*numpoints + j] = 0;
+    for (i = 0; i < numpoints; i++) {
+
+        linkedList[i] = malloc((numpoints-i+1) * sizeof(vertexEdge));
+        nodePtr = linkedList[i];
+        nodePtr->edgeSize = 0;
+        nodePtr->vertex = i;
+        nodePtr++;
+        
+        for (j = i+1; j < numpoints; j++){
+            xd = (points[i][0] - points[j][0]);
+            yd = (points[i][1] - points[j][1]);
+            zd = (points[i][2] - points[j][2]);
+            wd = (points[i][3] - points[j][3]);
+            distance = sqrt(xd * xd + yd * yd + zd * zd + wd * wd);
+            nodePtr->edgeSize = distance;
+            nodePtr->vertex = j;
+            if ((numpoints > 1000 && distance > 0.25) ||
+                (numpoints > 10000 && distance > 0.18) ||
+                (numpoints > 20000 && distance > 0.15)){
+                nodePtr--;
             }
-            else {
-                xd = (points[i][0] - points[j][0]);
-                yd = (points[i][1] - points[j][1]);
-                zd = (points[i][2] - points[j][2]);
-                wd = (points[i][3] - points[j][3]);
-                distance = sqrt(xd * xd + yd * yd + zd * zd + wd * wd);
-                array[i*numpoints + j] = distance;
-                array[j*numpoints + i] = array[i*numpoints + j];
-            }
+            nodePtr++;
         }
+        (nodePtr)->vertex = -1;
     }
-    
-    return array;
+    return linkedList;
 }
